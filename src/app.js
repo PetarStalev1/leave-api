@@ -1,6 +1,12 @@
 const express = require('express');
 const app = express();
 
+require('dotenv').config()
+const {getDb} = require('./config/database')
+const schema = require('./db/schema')
+
+const db = getDb();
+db.exec(schema)
 
 app.use(express.json());
 
