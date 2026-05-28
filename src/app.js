@@ -4,6 +4,7 @@ const express = require('express');
 const {getDb} = require('./config/database')
 const schema = require('./db/schema')
 const authRoutes = require('./modules/auth/auth.routes')
+const {errorHandler} = require('./middleware/errorHandler')
 
 const app = express();
 const db = getDb();

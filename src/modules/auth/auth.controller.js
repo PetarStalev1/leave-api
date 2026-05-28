@@ -1,50 +1,50 @@
-const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const { getDb } = require('../../config/database')
+const bcrypt = require('bcryptjs')
+const {getDb} = require('../../config/database')
+const {Errors} = require('../../utils/errors')
+const {success} = require('../../utils/response')
 
-function login (req,res, next)
+function login(req,res,next) 
 {
+    try {
+        
+        const {email, password} = req.body
 
-    const { email, password } = req.body
-    
-    if(!email || !password)
-    {
-        return res.status(400).json(
-            {
-                error: {
-                    message: 'email and password are required.'
-                }
-            }
-        )
-    }
-
-    const dB = getDb()
-    const user = dB.prepare('SELECT * FROM users WHERE email = ?').get(email)
-
-    if(!user || !bcrypt.compareSync(password, user.password))
-    {
-         return res.status(401).json(
-            {
-                error: {
-                    message: 'email or password are wrong.'
-                }
-            }
-        )
-    }
-
-    const userToGiveToken = { userId: user.id, role: user.role }
-    const token = jwt.sign(
-        userToGiveToken,
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
-    )
-
-    return res.status(200).json({
-        data: {
-          token,
-          user: { id: user.id, name: user.name, email: user.email, role: user.role }
+        if(!email || !password)
+        {
+            throw Errors.validation('cant be empty')
         }
-    })
+
+        const dB = getDb()
+        const user = dB.prepare('SELECT * FROM users WHERE email = ?').get(email)
+
+        if(!user || !bcrypt.compareSync(password,user.password))
+        {
+            throw Errors.invalidCredentials()
+        }
+
+        const token = jwt.sign(
+            {userId:user.id,role:user.role},
+            process.env.JWT_SECRET,
+            {expiresIn: process.env.JWT_EXPIRES_IN || '8h'}
+        )
+
+
+        return success(res, {
+            
+            token,
+            user: {
+                id: user.id, 
+                name: user.name,
+                email:user.email,
+                role:user.role
+            }
+        })
+
+
+    } catch (error) {
+        next(error)
+    }
 }
 
-module.exports = { login }
+module.exports = {login}
