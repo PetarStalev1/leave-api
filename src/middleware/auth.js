@@ -6,7 +6,7 @@ function authenticate(req,res,next)
 {
     const header = req.headers.authorization
 
-    if(!header || !header.startsWith('Bearer ')){
+    if(!header || !header.startsWith('Bearer ')){ 
        const err = Errors.missingToken()
        return res.status(err.status).json({code: err.code, message: err.message})
     }
@@ -25,4 +25,16 @@ function authenticate(req,res,next)
 
 }
 
-module.exports = { authenticate }
+function requireRole(role)
+{
+ return (req,res,next) => {
+    if(req.user.role !== role)
+    {
+        return res.status(403).json({ error: {message:`This endpoint requires the ${role} role.`}})
+    }
+ }
+ next()
+
+}
+
+module.exports = { authenticate, requireRole }
