@@ -25,19 +25,6 @@ function submitLeave( userId, {start_date, end_date, leave_type, reason})
 {
     const db = getDb();
 
-    const validTypes = ['annual', 'sick', 'unpaid'];
-    if (!validTypes.includes(leave_type)) {
-        throw Errors.validation('leave_type must be annual, sick or unpaid');
-    }
-
-    if (!isValidDate(start_date) || !isValidDate(end_date)) {
-        throw Errors.validation('Dates must be in correct format');
-    }
-
-    if (end_date < start_date) {
-        throw Errors.validation('End date must be greater than or equal to start date');
-    }
-
     if (start_date < today()) {
         throw Errors.pastDate();
     }
@@ -157,36 +144,22 @@ function listMyLeaves(userId, filters = {}) {
     const params = [userId];
 
     if (filters.status) {
-        const validStatuses = ['pending', 'approved', 'rejected', 'cancelled'];
-        if (!validStatuses.includes(filters.status)) {
-            throw Errors.validation(`status must be one of: ${validStatuses.join(', ')}.`);
-        }
-
         query += ' AND status = ?';
-        params.push(filters.status); 
+        params.push(filters.status);
     }
 
     if (filters.leave_type) {
-        const validTypes = ['annual', 'sick', 'unpaid'];
-        if (!validTypes.includes(filters.leave_type)) {
-            throw Errors.validation(`leave_type must be one of: ${validTypes.join(', ')}.`);
-        }
-        
         query += ' AND leave_type = ?';
         params.push(filters.leave_type);
     }
 
     if (filters.from) {
-        if (!isValidDate(filters.from)) throw Errors.validation('from must be YYYY-MM-DD');
-
         query += ' AND end_date >= ?';
         params.push(filters.from);
     }
 
     if (filters.to) {
-        if (!isValidDate(filters.to)) throw Errors.validation('to must be YYYY-MM-DD');
-        
-        query += ' AND start_date <= ?'; 
+        query += ' AND start_date <= ?';
         params.push(filters.to);
     }
 
@@ -197,7 +170,8 @@ function listMyLeaves(userId, filters = {}) {
 
 function listPendingLeaves(filters = {})
 {
-    const db = getDb()
+    const db = getDb();
+    
     let query = `
         SELECT lr.*, u.name as requester_name, u.email as requester_email 
         FROM leave_requests lr
@@ -206,29 +180,24 @@ function listPendingLeaves(filters = {})
     `;
     const params = [];
 
-    if(filters.user_id)
-    {
-        query += ' AND lr.user_id = ?'
-        params.push(Number(filters.user_id))
+    if (filters.user_id) {
+        query += ' AND lr.user_id = ?';
+        params.push(Number(filters.user_id)); 
     }
 
-    if(filters.from)
-    {
-        if(!isValidDate(filters.from)) throw Errors.validation('to must be YYYY-MM-DD')
-            query += ' AND lr.end_date >= ?'
-        params.push(filters.from)
-    }
-    
-    if(filters.to)
-    {
-        if(!isValidDate(filters.to)) throw Errors.validation('to must be YYYY-MM-DD')
-        query += ' AND lr.start_date <= ?'
-        params.push(filters.to)
+    if (filters.from) {
+        query += ' AND lr.end_date >= ?';
+        params.push(filters.from);
     }
 
-    query += ' ORDER BY lr.created_at ASC'
+    if (filters.to) {
+        query += ' AND lr.start_date <= ?';
+        params.push(filters.to);
+    }
 
-    return db.prepare(query).all(...params)
+    query += ' ORDER BY lr.created_at ASC';
+
+    return db.prepare(query).all(...params);
 }
 
 module.exports = { 
