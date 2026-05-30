@@ -32,9 +32,8 @@ function requireRole(role)
     {
         return res.status(403).json({ error: {message:`This endpoint requires the ${role} role.`}})
     }
+    next()
  }
- next()
-
 }
 
 module.exports = { authenticate, requireRole }

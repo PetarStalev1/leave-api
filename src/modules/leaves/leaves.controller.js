@@ -1,4 +1,4 @@
-const service = requrie('./leaves.service')
+const service = require('./leaves.service')
 const { success,created } = require('../../utils/response')
 
 function getBalance(req,res,next) 
@@ -55,7 +55,7 @@ function cancelLeave(req,res,next)
 function listPending(req,res,next)
 {
     try {
-        const listPendingLeaves = service.listPending(req.query)
+        const listPendingLeaves = service.listPendingLeaves(req.query)
         return success(res, listPendingLeaves)
 
     } catch (error) {
