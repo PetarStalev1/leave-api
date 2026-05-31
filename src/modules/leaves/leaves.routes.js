@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const {authenticate, requireRole} = require('../../middleware/auth')
 const c = require('./leaves.controller')
-const v = require('./leaves.validators')
+const v = require('./leaves.validator')
 
 router.get('/me/balance', authenticate, c.getBalance)
 router.get('/me/leaves', authenticate, v.validateListQuery, c.listMyLeaves)
