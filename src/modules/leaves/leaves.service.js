@@ -37,7 +37,7 @@ function submitLeave( userId, {start_date, end_date, leave_type, reason})
     const overlap = db.prepare(`
         SELECT id FROM leave_requests 
         WHERE user_id = ? 
-          AND status = 'approved' 
+          AND status = IN ('approved', 'pending')
           AND start_date <= ? 
           AND end_date >= ?
     `).get(userId, end_date, start_date);
