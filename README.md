@@ -28,14 +28,20 @@ Server runs on `http://localhost:3000`
 
 ---
 
-## Assumptions
+## Assumptions & Business Rules
 
-- Working week is Monday to Friday
-- Public holidays are not implemented
-- Leave balance resets every January 1st
-- Sick and unpaid leave do not consume annual balance
-- Start date cannot be in the past
-- Only pending requests can be cancelled
+- Working week is **Monday to Friday**
+- **Public holidays are not implemented** — would require a country-specific calendar
+- Leave balance resets every **January 1st**
+- **Sick and unpaid** leave do not consume annual balance
+- Start date **cannot be in the past**
+- Only **pending** requests can be cancelled
+- **Only the requester** can cancel their own leave
+- Manager **cannot approve or reject their own** leave request
+- Business rules are **re-validated at approval time** — balance and overlap are checked again in case state changed since submission
+- Passwords are **hashed with bcrypt**
+- JWT tokens expire after **8 hours**
+- Input validation is handled by a **dedicated validator middleware** layer, keeping business logic in the service layer clean
 
 ---
 
@@ -122,23 +128,6 @@ curl -X PUT http://localhost:3000/users/manager/leaves/1/reject \
 
 ---
 
-## Assumptions & Business Rules
-
-- Working week is **Monday to Friday**
-- **Public holidays are not implemented** — would require a country-specific calendar
-- Leave balance resets every **January 1st**
-- **Sick and unpaid** leave do not consume annual balance
-- Start date **cannot be in the past**
-- Only **pending** requests can be cancelled
-- **Only the requester** can cancel their own leave
-- Manager **cannot approve or reject their own** leave request
-- Business rules are **re-validated at approval time** — balance and overlap are checked again in case state changed since submission
-- Passwords are **hashed with bcrypt**
-- JWT tokens expire after **8 hours**
-- Input validation is handled by a **dedicated validator middleware** layer, keeping business logic in the service layer clean
-
----
-
 ## What I'd do next
 
 - Public holidays per country
@@ -148,4 +137,3 @@ curl -X PUT http://localhost:3000/users/manager/leaves/1/reject \
 - Rate limiting on login endpoint to prevent brute force
 - Docker setup for easy deployment
 - Multi-year balance history
-
