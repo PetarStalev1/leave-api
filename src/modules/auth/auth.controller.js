@@ -12,7 +12,7 @@ function login(req,res,next)
 
         if(!email || !password)
         {
-            throw Errors.validation('cant be empty')
+            throw Errors.validation('email or password cant be empty')
         }
 
         const dB = getDb()
